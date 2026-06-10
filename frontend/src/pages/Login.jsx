@@ -8,34 +8,33 @@ const Login = () => {
     password: "",
   });
 
-  const handleChange = (e) => {
+    const handleChange = (e) => {
     setData((prev) => ({
       ...prev,
       [e.target.name]: e.target.value,
     }));
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+ const handleSubmit = async (e) => {
+  e.preventDefault();
 
-    try {
-      const response = await axios.post(
-        "http://localhost:8000/api/user/login",
-        data
-      );
+  try {
+    const response = await axios.post(
+      "http://localhost:8000/api/user/login",
+      data
+    );
 
-      console.log(response.data);
-
-      if (response.data.success) {
-        alert("Login Successful");
-      } else {
-        alert(response.data.message);
-      }
-    } catch (error) {
-      console.log(error);
-      alert("Something went wrong");
+    if (response.data.success) {
+      alert("Login Successful");
+    } else {
+      alert(response.data.message);
     }
-  };
+
+  } catch (error) {
+    console.log("Catch Error:", error);
+    alert("Something went wrong");
+  }
+};
 
   return (
     <main className="px-4 md:px-8 min-h-screen flex items-center justify-center">

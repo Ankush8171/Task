@@ -1,11 +1,9 @@
 
 import React, { useState } from "react";
 import axios from "axios";
-import { useNavigate,Link } from "react-router-dom";
-
+import { useNavigate, Link } from "react-router-dom";
 
 const Signup = () => {
-
  const navigate = useNavigate();   
   const [data, setData] = useState({
     user: "",
@@ -31,26 +29,35 @@ const Signup = () => {
         data
       );
 
-      console.log(response.data);
-
       if (response.data.success) {
-        alert("User Registered Successfully");
 
-        setData({
-          user: "",
-          email: "",
-          password: "",
-        });
+      localStorage.setItem(
+       "token",
+      response.data.token
+      );
 
-        navigate("/login");
-      } else {
+  alert("User Registered Successfully");
+
+  setData({
+    user: "",
+    email: "",
+    password: "",
+  });
+
+  navigate("/login");
+} else {
         alert(response.data.message);
       }
-    } catch (error) {
-      console.log(error);
-      alert("Something went wrong");
-    }
+    } catch(err){
+    console.log(err);
+
+    response.json({
+        success:false,
+        message:"Error"
+    })
+}
   };
+
 
   return (
     <main className="px-4 md:px-8 min-h-screen flex flex-col items-center justify-center">
@@ -135,10 +142,6 @@ const Signup = () => {
 
           <div className="mt-6 text-sm text-center">
             Already have an account?{" "}
-            {/* <a href="#" className="text-blue-600 font-medium">
-              Login Here
-            </a> */}
-
              <Link
              to="/login"
             className="text-blue-600 font-medium"

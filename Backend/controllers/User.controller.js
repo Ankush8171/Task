@@ -1,9 +1,19 @@
 import userModel from "../models/user.model.js";
 import bcrypt from "bcrypt"
 import validator from "validator"
+import jwt from "jsonwebtoken";
+
+
+const createToken = (id) => {
+  return jwt.sign(
+    { id },
+    process.env.JWT_SECRET
+  );
+};
 
 const registerUser = async (req,res)=>{
     const {user,password,email} = req.body;
+    console.log(req.body);
     try{
         const exists = await userModel.findOne({email});
         if(exists){
@@ -27,23 +37,33 @@ const registerUser = async (req,res)=>{
             password:hashedPassword
         })
 
-        const saveduser =await newUser.save();
-         
-        res.json({success:true,saveduser});
+        const saveduser = await newUser.save();
+        const token = createToken(saveduser._id);
+
+        res.json({
+            success: true,
+             token,
+             user: saveduser
+             
+        });;
 
     }catch(err){
-        console.log(err);
-        res.json({
-            success:false,
-            message:'Error'
-        })
+    console.log(err);
+
+    res.json({
+        success:false,
+        message: err.message
+    })
+}
 
     }
 
-}
+
 
 
 //login user
+
+
 const loginUser = async(req,res)=>{
     const {email,password} = req.body;
 
@@ -66,7 +86,8 @@ const loginUser = async(req,res)=>{
             })
         }
 
-    res.json({success:true});
+        const token = createToken(user._id);
+        res.json({success:true,token});
     }catch(err){
         console.log(err);
         res.json({success:false,message:"Error"})
@@ -113,10 +134,58 @@ const deleteUser = async (req, res) => {
 };
 
 
+// Add User
+const addUser = async (req, res) => {
+  try {
+   const { user, email,password } = req.body;
+
+  const newUser = await userModel.create({
+    user,
+    email,
+  });
+
+  res.json({
+    success: true,
+    data: newUser,
+  });
+  } catch (error) {
+    res.json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+// Update User
+const updateUser = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const updatedUser = await userModel.findByIdAndUpdate(
+      id,
+      req.body,
+      { new: true }
+    );
+
+    res.json({
+      success: true,
+      updatedUser,
+    });
+  } catch (error) {
+    res.json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
 
 export {
     registerUser,
     loginUser,
     getUsers,
-    deleteUser
+    deleteUser,
+    updateUser,
+    addUser
+    
 }
